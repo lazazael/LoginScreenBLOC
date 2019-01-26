@@ -1,25 +1,28 @@
 import 'package:flutter/material.dart';
 import '../blocs/bloc.dart';
+import '../blocs/provider.dart';
 
 // here the loginscreen widget is stateless because the BLOC keeps the state not the widget itself
 
 class LoginScreen extends StatelessWidget {
   Widget build(context) {
+    final bloc = Provider.of(context);
+
     return Container(
       margin: EdgeInsets.all(20.0),
       child: Column(
         children: <Widget>[
-          fieldEmail(),
-          Container(margin: EdgeInsets.only(top: 20.0)),
-          fieldPassw(),
-          Container(margin: EdgeInsets.only(top: 20.0)),
-          buttonSubmit(),
+          fieldEmail(bloc),
+          Container(margin: EdgeInsets.only(top: 30.0)),
+          fieldPassw(bloc),
+          Container(margin: EdgeInsets.only(top: 30.0)),
+          buttonSubmit(bloc),
         ],
       ),
     );
   }
 
-  Widget fieldEmail() {
+  Widget fieldEmail(Bloc bloc) {
     return StreamBuilder(
       stream: bloc.streamEmail,
       builder: (context, snapshot) {
@@ -39,18 +42,37 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget fieldPassw() {
-    return TextField(
-      obscureText: true,
-      decoration: InputDecoration(hintText: 'PassWord999!%^', labelText: 'Password'),
-    );
+  Widget fieldPassw(Bloc bloc) {
+    return StreamBuilder(
+        stream: bloc.streamPassw,
+        builder: (context, snapshot) {
+          return TextField(
+              onChanged: bloc.changePassw,
+              keyboardType: TextInputType.text,
+              decoration: InputDecoration(
+                hintText: 'password must contain at least 4 charz',
+                labelText: 'Passwordz',
+                errorText: snapshot.error,
+              ));
+        });
   }
 
-  Widget buttonSubmit() {
-    return RaisedButton(
-      child: Text('Login'),
-      color: Colors.lightGreen,
-      onPressed: () {},
+  Widget buttonSubmit(Bloc bloc) {
+    return StreamBuilder(
+      stream: bloc.submitValid,
+      builder: (context, snapshot) {
+        return RaisedButton(
+          child: Text('Login'),
+          color: Colors.lightGreen,
+          //to disable to button call it with null
+          //onPressed: () {},
+          onPressed: snapshot.hasData ? bloc.submit : null,
+/*               ? () {
+                  print('hi');
+                }
+              : null, */
+        );
+      },
     );
   }
 }
